@@ -17,6 +17,7 @@ import {
   Zap, Package, FileCode, FolderOpen, LayoutDashboard, FolderGit2, Layers,
   KeyRound, CreditCard, Settings, Bell, Search, Menu, X, ChevronDown, ChevronRight,
   LogOut, User, TrendingUp, Plus, Download, Copy, Check, Circle, Terminal,
+  type LucideIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -27,7 +28,35 @@ import { Input } from "@/components/ui/input"
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 
 /* Tiny className joiner so this file doesn't depend on "@/lib/utils" being present */
-const cx = (...c) => c.filter(Boolean).join(" ")
+const cx = (...c: Array<string | false | null | undefined>) =>
+  c.filter(Boolean).join(" ")
+
+type StackId = keyof typeof STACK_META
+
+type NavItem = {
+  id: string
+  label: string
+  icon: LucideIcon
+}
+
+type UsagePoint = {
+  label: string
+  value: number
+}
+
+type Project = {
+  id: number
+  name: string
+  stack: StackId
+  files: number
+  created: string
+}
+
+type QuickStartItem = {
+  id: number
+  label: string
+  done: boolean
+}
 
 /* ════════════════════════════════════════════════════════════════
    MOCK DATA
@@ -59,7 +88,7 @@ const STATS = {
   stacksInUse: 4,
 }
 
-const RECENT_PROJECTS = [
+const RECENT_PROJECTS: Project[] = [
   { id: 1, name: "task-manager-api", stack: "nextjs", files: 11, created: "2 hours ago" },
   { id: 2, name: "blog-cms-backend", stack: "mern", files: 9, created: "Yesterday" },
   { id: 3, name: "shop-checkout-service", stack: "hono", files: 8, created: "3 days ago" },
@@ -90,19 +119,21 @@ const USAGE_DATA = RAW_USAGE.map((value, i) => {
 /* ════════════════════════════════════════════════════════════════
    HOOKS
    ════════════════════════════════════════════════════════════════ */
-function useCountUp(target, duration = 900) {
-  const [value, setValue] = useState(0)
+function useCountUp(target: number, duration = 900) {
+  const [value, setValue] = useState<number>(0)
   useEffect(() => {
-    let raf
+    let raf: number | undefined
     const start = performance.now()
-    function tick(now) {
+    function tick(now: number) {
       const progress = Math.min((now - start) / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
       setValue(Math.round(target * eased))
       if (progress < 1) raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    return () => {
+      if (raf !== undefined) cancelAnimationFrame(raf)
+    }
   }, [target, duration])
   return value
 }
@@ -127,7 +158,7 @@ function Logo() {
   )
 }
 
-function StackBadge({ stackId }) {
+function StackBadge({ stackId }: { stackId: StackId }) {
   const meta = STACK_META[stackId]
   if (!meta) return null
   return (
@@ -137,12 +168,18 @@ function StackBadge({ stackId }) {
   )
 }
 
-function UsageTooltip({ active, payload, label }) {
+type TooltipProps = {
+  active?: boolean
+  payload?: Array<{ value?: number | string }>
+  label?: string
+}
+
+function UsageTooltip({ active, payload, label }: TooltipProps) {
   if (!active || !payload || !payload.length) return null
   return (
     <div className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 shadow-2xl">
       <p className="text-xs text-zinc-500 font-mono mb-0.5">{label}</p>
-      <p className="text-sm font-semibold text-emerald-400">{payload[0].value} scaffolds</p>
+      <p className="text-sm font-semibold text-emerald-400">{payload[0]?.value ?? 0} scaffolds</p>
     </div>
   )
 }
@@ -150,7 +187,15 @@ function UsageTooltip({ active, payload, label }) {
 /* ════════════════════════════════════════════════════════════════
    SIDEBAR
    ════════════════════════════════════════════════════════════════ */
-function SidebarContent({ activeNav, onNavigate, onClose }) {
+function SidebarContent({
+  activeNav,
+  onNavigate,
+  onClose,
+}: {
+  activeNav: string
+  onNavigate: (id: string) => void
+  onClose?: () => void
+}) {
   return (
     <div className="flex flex-col h-full">
       <div className="h-14 flex items-center justify-between px-5 border-b border-zinc-800 shrink-0">
@@ -213,7 +258,19 @@ function SidebarContent({ activeNav, onNavigate, onClose }) {
 /* ════════════════════════════════════════════════════════════════
    TOPBAR
    ════════════════════════════════════════════════════════════════ */
-function Topbar({ onMenuClick, notifOpen, setNotifOpen, userMenuOpen, setUserMenuOpen }) {
+function Topbar({
+  onMenuClick,
+  notifOpen,
+  setNotifOpen,
+  userMenuOpen,
+  setUserMenuOpen,
+}: {
+  onMenuClick: () => void
+  notifOpen: boolean
+  setNotifOpen: React.Dispatch<React.SetStateAction<boolean>>
+  userMenuOpen: boolean
+  setUserMenuOpen: React.Dispatch<React.SetStateAction<boolean>>
+}) {
   return (
     <header className="sticky top-0 z-30 h-14 flex items-center gap-2 sm:gap-3 px-4 md:px-6 bg-black/80 backdrop-blur-md border-b border-zinc-800 shrink-0">
       <button onClick={onMenuClick} className="text-zinc-400 hover:text-zinc-100 transition-colors lg:hidden shrink-0" aria-label="Open menu">
@@ -311,7 +368,19 @@ function Topbar({ onMenuClick, notifOpen, setNotifOpen, userMenuOpen, setUserMen
 /* ════════════════════════════════════════════════════════════════
    STAT CARD
    ════════════════════════════════════════════════════════════════ */
-function StatCard({ icon: Icon, label, value, tag, tone = "positive" }) {
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  tag,
+  tone = "positive",
+}: {
+  icon: LucideIcon
+  label: string
+  value: number
+  tag?: string
+  tone?: "positive" | "neutral"
+}) {
   const count = useCountUp(value)
   return (
     <Card className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 transition-colors">
@@ -343,10 +412,18 @@ function StatCard({ icon: Icon, label, value, tag, tone = "positive" }) {
    USAGE CARD — signature terminal-chrome panel (mirrors the landing
    page's generator output window)
    ════════════════════════════════════════════════════════════════ */
-function UsageCard({ period, setPeriod, data }) {
-  const total = data.reduce((a, b) => a + b.value, 0)
+function UsageCard({
+  period,
+  setPeriod,
+  data,
+}: {
+  period: string
+  setPeriod: React.Dispatch<React.SetStateAction<string>>
+  data: UsagePoint[]
+}) {
+  const total = data.reduce((a: number, b: UsagePoint) => a + b.value, 0)
   const avg = (total / data.length).toFixed(1)
-  const peak = Math.max(...data.map((d) => d.value))
+  const peak = Math.max(...data.map((d: UsagePoint) => d.value))
 
   return (
     <Card className="bg-zinc-950 border-zinc-800 overflow-hidden h-full">
@@ -412,7 +489,7 @@ function UsageCard({ period, setPeriod, data }) {
 /* ════════════════════════════════════════════════════════════════
    PLAN CARD
    ════════════════════════════════════════════════════════════════ */
-function PlanCard({ used, limit }) {
+function PlanCard({ used, limit }: { used: number; limit: number }) {
   const pct = Math.min(100, Math.round((used / limit) * 100))
   const nearLimit = pct >= 80
   const left = Math.max(0, limit - used)
@@ -456,7 +533,7 @@ function PlanCard({ used, limit }) {
 /* ════════════════════════════════════════════════════════════════
    PROJECTS TABLE
    ════════════════════════════════════════════════════════════════ */
-function ProjectsTable({ projects }) {
+function ProjectsTable({ projects }: { projects: Project[] }) {
   return (
     <Card className="bg-zinc-900 border-zinc-800 h-full">
       <CardContent className="p-6">
@@ -530,7 +607,7 @@ function ProjectsTable({ projects }) {
 /* ════════════════════════════════════════════════════════════════
    QUICK START
    ════════════════════════════════════════════════════════════════ */
-function QuickStartCard({ items }) {
+function QuickStartCard({ items }: { items: QuickStartItem[] }) {
   const [copied, setCopied] = useState(false)
   const doneCount = items.filter((i) => i.done).length
 
@@ -589,7 +666,7 @@ export default function Dashboard() {
   const [period, setPeriod] = useState("14")
 
   useEffect(() => {
-    function onKey(e) {
+    function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         setMobileNavOpen(false)
         setNotifOpen(false)
