@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import Navbar from "@/components/ui/Navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -42,6 +43,7 @@ const sectionIndex = [
 export default function RefundPolicyPage() {
   return (
     <div className="bg-[#FAF8F2] text-[#12201D] font-sans antialiased">
+      <Navbar />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap');
         .font-serif { font-family: 'Fraunces', ui-serif, Georgia, serif; font-optical-sizing: auto; }
@@ -118,27 +120,6 @@ export default function RefundPolicyPage() {
         </Reveal>
 
         {/* On this page */}
-        <Reveal delay={80}>
-          <Card className="mb-14 border-[#DCD4BE] bg-white shadow-none">
-            <CardContent className="p-6">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#4C5B57]">
-                On this page
-              </p>
-              <nav className="grid grid-cols-1 gap-x-6 gap-y-1.5 sm:grid-cols-2">
-                {sectionIndex.map((s) => (
-                  <a
-                    key={s.id}
-                    href={`#${s.id}`}
-                    className="rounded-sm text-sm text-[#4C5B57] transition-colors hover:text-[#B9862E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B9862E]"
-                  >
-                    {s.num}. {s.title}
-                  </a>
-                ))}
-              </nav>
-            </CardContent>
-          </Card>
-        </Reveal>
-
         <PolicySection id="returns-window" index="01" title="Returns window">
           <p>
             You have <strong>30 calendar days</strong> from the delivery date

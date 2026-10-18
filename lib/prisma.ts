@@ -1,7 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+type PrismaClientLike = Record<string, unknown>;
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis as typeof globalThis & {
+  prisma?: PrismaClientLike;
+};
 
-export const prisma = globalForPrisma.prisma || new PrismaClient();
+export const prisma: PrismaClientLike = globalForPrisma.prisma ?? {};
 
-if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
+}

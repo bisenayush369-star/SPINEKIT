@@ -19,6 +19,7 @@ import {
   LogOut, User, TrendingUp, Plus, Download, Copy, Check, Circle, Terminal,
   type LucideIcon,
 } from "lucide-react"
+import Navbar from "@/components/ui/Navbar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -659,28 +660,7 @@ function QuickStartCard({ items }: { items: QuickStartItem[] }) {
    MAIN DASHBOARD
    ════════════════════════════════════════════════════════════════ */
 export default function Dashboard() {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const [notifOpen, setNotifOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [activeNav, setActiveNav] = useState("overview")
   const [period, setPeriod] = useState("14")
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setMobileNavOpen(false)
-        setNotifOpen(false)
-        setUserMenuOpen(false)
-      }
-    }
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
-  }, [])
-
-  useEffect(() => {
-    document.body.style.overflow = mobileNavOpen ? "hidden" : ""
-    return () => { document.body.style.overflow = "" }
-  }, [mobileNavOpen])
 
   const chartData = useMemo(() => USAGE_DATA.slice(-Number(period)), [period])
 
@@ -697,94 +677,51 @@ export default function Dashboard() {
   )
 
   return (
-    <div className="bg-black min-h-screen text-zinc-50 font-sans antialiased flex">
-      <style>{`
-        @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
-          }
-        }
-      `}</style>
+    <div className="bg-black min-h-screen text-zinc-50 font-sans antialiased">
+      <Navbar />
 
-      <div
-        onClick={() => setMobileNavOpen(false)}
-        className={cx(
-          "fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 lg:hidden",
-          mobileNavOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        )}
-      />
-
-      <aside
-        className={cx(
-          "fixed inset-y-0 left-0 z-50 w-72 bg-zinc-950 border-r border-zinc-800 transform transition-transform duration-300 ease-out lg:hidden",
-          mobileNavOpen ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        <SidebarContent
-          activeNav={activeNav}
-          onNavigate={(id) => { setActiveNav(id); setMobileNavOpen(false) }}
-          onClose={() => setMobileNavOpen(false)}
-        />
-      </aside>
-
-      <aside className="hidden lg:flex lg:flex-col w-64 shrink-0 border-r border-zinc-800 bg-zinc-950/40 sticky top-0 h-screen">
-        <SidebarContent activeNav={activeNav} onNavigate={setActiveNav} />
-      </aside>
-
-      <div className="flex-1 min-w-0 flex flex-col">
-        <Topbar
-          onMenuClick={() => setMobileNavOpen(true)}
-          notifOpen={notifOpen}
-          setNotifOpen={setNotifOpen}
-          userMenuOpen={userMenuOpen}
-          setUserMenuOpen={setUserMenuOpen}
-        />
-
-        <main className="flex-1 px-4 md:px-6 lg:px-8 py-6 md:py-8 max-w-7xl w-full mx-auto">
-          <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
-            <div
-              className="absolute -top-10 left-0 pointer-events-none -z-10"
-              style={{ width: 420, height: 220, background: "radial-gradient(ellipse at center, rgba(16,185,129,0.07) 0%, transparent 70%)" }}
-            />
-            <div>
-              <h2 className="text-xl md:text-2xl font-extrabold tracking-tight">{greeting}, Alex</h2>
-              <p className="text-sm text-zinc-500 mt-1">{dateLabel}</p>
-            </div>
-            <Button className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold gap-2 self-start sm:self-auto">
-              <Plus className="w-4 h-4" /> Generate new scaffold
-            </Button>
+      <main className="mx-auto max-w-7xl w-full px-4 py-6 md:px-6 md:py-8 lg:px-8">
+        <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-7">
+          <div
+            className="absolute -top-10 left-0 pointer-events-none -z-10"
+            style={{ width: 420, height: 220, background: "radial-gradient(ellipse at center, rgba(16,185,129,0.07) 0%, transparent 70%)" }}
+          />
+          <div>
+            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight">{greeting}, Alex</h2>
+            <p className="text-sm text-zinc-500 mt-1">{dateLabel}</p>
           </div>
+          <Button className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold gap-2 self-start sm:self-auto">
+            <Plus className="w-4 h-4" /> Generate new scaffold
+          </Button>
+        </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            <StatCard icon={Zap} label="Generations today" value={STATS.generationsToday} tag={`of ${STATS.dailyLimit} daily`} tone="neutral" />
-            <StatCard icon={Package} label="Scaffolds generated" value={STATS.scaffoldsTotal} tag={`+${STATS.scaffoldsDelta} this week`} />
-            <StatCard icon={FileCode} label="Files generated" value={STATS.filesTotal} tag={`+${STATS.filesDelta} this week`} />
-            <StatCard icon={FolderOpen} label="Active projects" value={STATS.activeProjects} tag={`${STATS.stacksInUse} stacks`} tone="neutral" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+          <StatCard icon={Zap} label="Generations today" value={STATS.generationsToday} tag={`of ${STATS.dailyLimit} daily`} tone="neutral" />
+          <StatCard icon={Package} label="Scaffolds generated" value={STATS.scaffoldsTotal} tag={`+${STATS.scaffoldsDelta} this week`} />
+          <StatCard icon={FileCode} label="Files generated" value={STATS.filesTotal} tag={`+${STATS.filesDelta} this week`} />
+          <StatCard icon={FolderOpen} label="Active projects" value={STATS.activeProjects} tag={`${STATS.stacksInUse} stacks`} tone="neutral" />
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-4">
+          <div className="xl:col-span-2">
+            <UsageCard period={period} setPeriod={setPeriod} data={chartData} />
           </div>
-
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-4">
-            <div className="xl:col-span-2">
-              <UsageCard period={period} setPeriod={setPeriod} data={chartData} />
-            </div>
-            <div className="xl:col-span-1">
-              <PlanCard used={STATS.generationsToday} limit={STATS.dailyLimit} />
-            </div>
+          <div className="xl:col-span-1">
+            <PlanCard used={STATS.generationsToday} limit={STATS.dailyLimit} />
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-6">
-            <div className="xl:col-span-2">
-              <ProjectsTable projects={RECENT_PROJECTS} />
-            </div>
-            <div className="xl:col-span-1">
-              <QuickStartCard items={QUICKSTART} />
-            </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 mb-6">
+          <div className="xl:col-span-2">
+            <ProjectsTable projects={RECENT_PROJECTS} />
           </div>
+          <div className="xl:col-span-1">
+            <QuickStartCard items={QUICKSTART} />
+          </div>
+        </div>
 
-          <p className="text-center text-xs text-zinc-700 mb-2">Spine · spine.io © {new Date().getFullYear()}</p>
-        </main>
-      </div>
+        <p className="text-center text-xs text-zinc-700 mb-2">SPINEKIT © {new Date().getFullYear()}</p>
+      </main>
     </div>
   )
 }

@@ -20,6 +20,7 @@
 
 import { ChevronDown, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Navbar from "@/components/ui/Navbar"
 
 const GithubIcon = ({ className }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -233,38 +234,7 @@ function Block({ block }: { block: { type: string; text?: string; items?: string
 export default function PrivacyPolicyPage() {
   return (
     <div className="bg-black min-h-screen text-zinc-50 font-sans antialiased">
-      {/* ── NAV ─────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 h-14 flex items-center justify-between px-5 md:px-12 bg-black/85 backdrop-blur-md border-b border-zinc-800">
-        <a href="/" className="flex items-center gap-2.5">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <line x1="12" y1="1" x2="12" y2="23" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
-            <line x1="12" y1="5" x2="18" y2="3" stroke="#34d399" strokeWidth="1.4" strokeLinecap="round" />
-            <line x1="12" y1="5" x2="6" y2="3" stroke="#34d399" strokeWidth="1.4" strokeLinecap="round" opacity="0.45" />
-            <line x1="12" y1="11" x2="18" y2="9" stroke="#34d399" strokeWidth="1.4" strokeLinecap="round" />
-            <line x1="12" y1="11" x2="6" y2="9" stroke="#34d399" strokeWidth="1.4" strokeLinecap="round" opacity="0.45" />
-            <line x1="12" y1="17" x2="18" y2="15" stroke="#34d399" strokeWidth="1.4" strokeLinecap="round" />
-            <line x1="12" y1="17" x2="6" y2="15" stroke="#34d399" strokeWidth="1.4" strokeLinecap="round" opacity="0.45" />
-          </svg>
-          <span className="font-bold text-base tracking-tight">Spine</span>
-        </a>
-        <div className="hidden md:flex items-center gap-7">
-          <a href="/#templates" className="text-sm text-zinc-500 hover:text-zinc-100 transition-colors">Templates</a>
-          <a href="/#pricing" className="text-sm text-zinc-500 hover:text-zinc-100 transition-colors">Pricing</a>
-          <a href="/faq" className="text-sm text-zinc-500 hover:text-zinc-100 transition-colors">FAQ</a>
-        </div>
-        <div className="flex items-center gap-2">
-          <a href="https://github.com" className="text-zinc-500 hover:text-zinc-200 transition-colors">
-            <GithubIcon className="w-4 h-4" />
-          </a>
-          <Button
-            onClick={() => { window.location.href = "/" }}
-            size="sm"
-            className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold text-xs h-8"
-          >
-            Get started
-          </Button>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* ── HEADER ──────────────────────────────────────────── */}
       <header className="max-w-3xl mx-auto px-5 md:px-12 pt-16 md:pt-20 pb-10 border-b border-zinc-800">
